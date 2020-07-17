@@ -1,0 +1,251 @@
+\chapter{Programação Linear Inteira}
+
+Está dentro dos métodos exatos. Abre mão do tempo polinomial para o pior caso, mas obtém sempre a solução ótima. Exemplos:
+
+\begin{itemize}
+    \item Programação dinâmica
+    \item \textit{Branch and bound}
+    \item Programação linear (inteira)
+    \item Programação por restrições
+\end{itemize}
+
+\section{Definição}
+
+Modelo matemático que descreve problemas de otimização combinatória.
+
+\begin{itemize}
+    \item Um conjunto de variáveis inteiras
+    \item Um conjunto de restrições (inequações lineares)
+    \item Uma função objetivo (expressão \underline{linear})
+\end{itemize}
+
+Solução viável: atribuição para as variáveis. Desde que satisfazam as restrições.
+
+\begin{example}
+    Existem também problemas mistos: com variáveis inteiras e contínuas.
+\end{example}
+
+\subsection{Forma genérica de um PLI}
+
+\begin{example}
+    $n$ variáveis
+    
+    $m$ restrições
+    
+    minimizar $\sum_{j=1}^n c_jx_j$
+    
+    sujeito a $\sum_{j=1}^n a_{ij}x_j\geq b_i, \forall i \in \left\{ 1,\dots , m\right\}$
+    
+    $x_j \in \mathbb{Z}^+, \forall j \in \left\{ 1, \dots ,n\right\}$
+\end{example}
+
+$a_{ij}, b_i$ e $c_j$ são constantes e $x_j$ são as variáveis.
+
+Função objetivo: $\sum_{j=1}^n c_jx_j$.
+
+Se multiplicar a função objetivo por $-1$, o problema de minimização se torna de maximização. Igualmente, para as restrições, pode multiplicar por $-1$ para obter uma inequação ``menor que'' ($\leq$). Para garantir a igualdade, usamos duas inequações:
+
+\[
+    \sum_{j=1}^n a_{ij}x_j = b_i \iff
+    \begin{cases}
+        \sum_{j=1}^n a_{ij}x_j \geq b_i \\
+        \sum_{j=1}^n a_{ij}x_j \leq b_i
+    \end{cases}
+\]
+
+É comum usar \underline{variáveis binárias}.
+
+\subsection{Programa linear}
+
+Pode-se fazer uma ``relaxação da integridade'' para obter um Programa Linear (PL), em que as variáveis deixam de ser inteiras e podem ser reais.
+
+Um programa linear inteiro sempre pode ser ``relaxado'' para um PL. Com isso, podemos garantir que o PL é um \textbf{limitante} do PLI original.
+
+\underline{Toda solução do PLI é uma solução do PL.}
+
+PL podem ser resolvidos em tempo polinomial. (PLI não garante isso)
+
+Resolvedores de PLI normalmente combinam \textit{branch and bound} com Pl. Para encontrar melhores limitantes inferiores e realizar mais podas na árvore de busca.
+
+\section{Problema da Mochila Binária}
+
+\begin{itemize}
+    \item Variáveis: $x_i \quad i = 1,\dots ,n$ binária, indicando se o item $i$ está na mochila.
+    \item Função objetivo: $\max\sum_{i=1}^n v_ix_i$. Maximizar o valor da mochila
+    \item Restrição: $\sum_{i=1}^n w_ix_i \leq W$. O peso máximo da mochila deve ser respeitado.
+\end{itemize}
+
+Qual o problema obtido ao se relaxar a restrição de integralidade dos $x_i$? $\to$ Mochila Fracionária
+
+\section{Problema do Escalonamento}
+
+\begin{itemize}
+    \item Variáveis: $x_{ij} \quad i = 1,\dots,n \quad j=1,\dots,m$ binária indicando se a tarefa $i$ está na máquina $j$.
+    \item $L_{\max}$. Variável que representa o makespan.
+    \item Função objetivo: $\min L_{\max}$. Minimizar o \textit{makespan}.
+    \item Restrições:
+    \begin{itemize}
+        \item $\sum_{j=1}^mx_{ij}=1$. Cada tarefa está alocada em uma única máquina.
+        \item $\sum_{i=1}^nt_ix_{ij}\leq L_{\max} \quad j=1,\dots,m$. O \textit{makespan} tem que ser $\geq$ à carga de qualquer máquina.
+    \end{itemize}
+    \item Domínio das variáveis:
+    \begin{itemize}
+        \item $x_{ij} \in \{0,1\} \quad i=1,\dots,n \quad j=1,\dots,m$
+        \item $L_{\max} \in \mathbb{R}$
+    \end{itemize}
+\end{itemize}
+
+É um problema de Programação Linear misto, porque tem variáveis inteiras ($x_{ij}$) e contínuas ($L_{\max}$) junto.
+
+\section{Problema da Colocação de Grafos}
+
+\begin{itemize}
+    \item Variáveis:
+    \begin{itemize}
+        \item $x_{uk} \quad u \in V \quad k = 1,\dots,\Delta(G)+1$. Indica se o vértice $u$ tem cor $k$. $\Delta(G)$ é o grau máximo no grafo.
+        \item $y_k \quad k=1,\dots,\Delta(G)+1$. Indica se a cor $k$ é usada.
+    \end{itemize}
+    \item Função objetivo: $\min\sum_{k=1}^{\Delta(G)+1}y_k$. Minimizar o número de cores usadas.
+    \item Restrições:
+    \begin{itemize}
+        \item $\sum_{k=1}^{\Delta(G)+1} x_{uk} = 1 \quad \forall u\in V$. Cada vértice tem apenas uma cor.
+        \item $x_{uk}+x_{vk} \leq 1 \quad \forall (u,v) \in E \quad k=1,\dots,\Delta(G)+1$. Vértices adjacentes tem cores diferentes.
+        \item $x_{uk} \leq y_k \quad \forall u \in V \quad k=1,\dots,\Delta(G)+1$. Um vértice só pode usar uma cor que esteja disponível (cujo $y_k=1$).
+    \end{itemize}
+    \item Domínio das variáveis:
+    \begin{itemize}
+        \item $x_{uk} \in \{0, 1\} \quad u \in V \quad k = 1,\dots,\Delta(G)+1$
+        \item $y_k \in \{0,1\} \quad k = 1,\dots,\Delta(G)+1$
+    \end{itemize}
+\end{itemize}
+
+O número máximo de cores é $\Delta(G) + 1$ porque o pior caso é quando o nó com maior grau tem todos os vizinhos com cores diferentes, então ele precisa ser colorido com uma cor nova.
+
+\section{Problema da Localização de Instalações sem Capacidades}
+
+\begin{itemize}
+    \item Variáveis:
+    \begin{itemize}
+        \item $y_i \quad i \in F$. Indica se a instalação $i$ foi aberta.
+        \item $x_{ij} \quad i \in F \quad j \in D$. Indica se cliente $j$ se conecta à instalação $i$.
+    \end{itemize}
+    \item Função objetivo: $\min\sum_{i \in F} f_iy_i + \sum_{j\in D}\sum_{i \in F} d_{ji}x_{ij}$. Minimizar o custo de abertura mais custo de conexão.
+    \item Restrições:
+    \begin{itemize}
+        \item $\sum_{i \in F}x_{ij}=1 \forall j \in D$. Cada cliente se conecta a apenas uma instalação.
+        \item $x_{ij}\leq y_i \quad \forall i \in F \quad \forall j \in D$. Cliente só pode se conectar a uma instalação aberta.
+    \end{itemize}
+    \item Domínio das variáveis:
+    \begin{itemize}
+        \item $x_{ij} \{0,1\} \quad \forall i \in F \quad \forall j \in D$
+        \item $y_i \in \{0,1\} i \in F$
+    \end{itemize}
+\end{itemize}
+
+\section{Problema da Cobertura por Conjuntos}
+
+\begin{itemize}
+    \item \textbf{Entrada:} conjunto de elementos $U = \{e_1,e_2,\dots,e_n\}$, uma coleção de subconjuntos $S_1,S_2,\dots,S_m$, cada subconjunto $S_j \subseteq U$ com peso $w_j$.
+    \item \textbf{Soluções viáveis:} uma coleção de subconjuntos que cobre $U$, i.e., encontrar $I \subseteq \{1,2,...,m\}$ tal que $\bigcup_{j \in I} S_j = U$.
+    \item \textbf{Função objetivo:} custo total dos subconjuntos em $I$, i.e., $\sum_{j \in I}w_j$.
+    \item \textbf{Objetivo:} encontrar coleção de custo mínimo.
+\end{itemize}
+
+\subsection{Formulação em PLI}
+
+\begin{itemize}
+    \item Variáveis: $x_j \quad j=1,\dots,m$. Indica se o conjunto $j$ foi escolhido.
+    \item Função objetivo: $\min\sum_{j=1}^mw_jx_j$. Minimizar o custo dos subconjuntos escolhidos.
+    \item Restrição: $\sum_{j:e_i \in S_j}x_j\geq 1\quad i=1,\dots,n$. Todo elemento deve ser coberto por ao menos um subconjunto.
+    \item Domínio das variáveis: $x_j \in \{0,1\} \quad j=1,...,m$
+\end{itemize}
+
+\section{Resolvedores de PLI}
+
+Ferramenta para fazer a modelagem de PLI: OR-tools. Gratuito.
+
+Resolvedores mais famosos: Gurobi, CPLEX. São resolvedores proprietários.
+
+\subsection{OR-Tools}
+
+Usar o \lstinline{pywraplp} do \lstinline{ortools.linear_solver}. Usar um resolvedor \lstinline{pywraplp.Solver}.
+
+O que tem que fazer é criar as variáveis em uma lista.
+
+\begin{lstlisting}
+x = list()
+for j in range(0, num_sets):
+    # Variaveis inteiras entre 0 e 1 = binarias
+    # Toda variavel tem um nome x[j]
+    x.append(solver.IntVar(0.0, 1.0, 'x[{}]'.format(j)))
+\end{lstlisting}
+
+Depois, criamos as restrições (\textit{constraints}) para cada elemento $e_i \in U$.
+
+\begin{lstlisting}
+constraintType1 = list()
+for i in range(0, num_elements):
+    # Um constraint tem dois limitantes (inferior e superior)
+    constraintType1.append(solver.Constraint(1, solver.infinity()))
+\end{lstlisting}
+
+Na parte direita da inequação ($\sum_{j:e_i \in S_j}$), nós levamos em consideração todos os conjuntos que possuem o elemento $e_i$. Então temos que passar por todos os conjuntos e seus elementos para indicar a restrição, aplicar aquele \textit{constraint} para aquele conjunto em específico (colocar o coeficiente como $1$).
+
+\begin{lstlisting}
+for s in set_list:
+    for i in s.elements:
+        constraintType1[i].Setcoefficient(x[s.index], 1)
+\end{lstlisting}
+
+Também temos que definir a função objetivo.
+
+\begin{lstlisting}
+objective = solver.Objective()
+objective.SetMinimization() # A funcao eh de minimizacao
+for j in range(0, num_sets):
+    objective.SetCoefficient(x[j], set_list[j].cost)
+\end{lstlisting}
+
+Depois de modelado, podemos apenas resolver usando \lstinline{solver.Solve()}
+
+\section{Problema do corte máximo}
+
+\begin{itemize}
+    \item Variáveis:
+    \begin{itemize}
+        \item $x_u \quad \forall u \in V$. Indica se o vértice $u$ esta no corte $S$.
+        \item $y_e \quad \forall e \in E$. Indica se a aresta atravessa o corte $S$.
+    \end{itemize}
+    \item Função objetivo: $\max\sum_{e \in E} y_e$. Maximizar o número de arestas no corte.
+    \item Restrições:
+    \begin{itemize}
+        \item $y_e \leq x_u - x_v + M \times a_e \quad \forall e=(u,v)\in E$. A aresta só atravessa o corte se os extremos estão em grupos distintos (direção $u \to v$).
+        \item $y_e \leq x_v - x_u + M \times (1-a_e) \quad \forall e=(u, v) \in E$. Direção $v \to u$.
+    \end{itemize}
+    \item Domínio das variáveis:
+    \begin{itemize}
+        \item $x_u \in \{0,1\} \quad \forall u \in V$
+        \item $y_e \in \{0,1\} \quad \forall e \in E$
+        \item $a_e \in \{0,1\} \quad \forall e \in E$
+    \end{itemize}
+\end{itemize}
+
+Usa o $M$, \underline{um número grande}, e uma variável auxiliar $a_e$ binária associada a cada aresta. Isso seleciona apenas uma das restrições a funcionar em cada tempo (tipo o módulo, mas módulo \textbf{não} é função linear). São duas restrições complementares. Por ser uma variável, o resolvedor vai escolher os melhores valores para $a_e$ para garantir o resultado.
+
+\section{Problema de Steiner}
+
+\begin{itemize}
+    \item \textbf{Entrada:} $G = (V, E)$, com $V = R \cup S$, sendo $R$ terminais e $S$ vértices de Steiner, e função $w$ de peso nas arestas.
+    \item \textbf{Soluções viávies:} árvores que conectam todos os vértices em $R$.
+    \item \textbf{Função objetivo:} soma dos pesos das arestas na árvore.
+    \item \textbf{Objetivo:} encontrar uma árvore de peso mínimo.
+\end{itemize}
+
+\subsection{Formulação em PLI}
+
+\begin{itemize}
+    \item Variáveis: $x_e \quad \forall e \in E$. Indica se a aresta $e$ está na árvore.
+    \item Função objetivo: $\min\sum_{e \in E}w_ex_e$. Minimizar o custo da árvore.
+    \item Restrições: $\sum_{e \in \delta(S)} x_e\geq 1\quad \forall S:S\cap R \neq\emptyset, S\cap R \subset R$ Qualquer corte $S$ que separa os terminais deve ter aresta atravessando.
+    \item Domínio das variáveis: $x_e \in \{0,1\} \quad \forall e \in E$.
+\end{itemize}

@@ -1,0 +1,99 @@
+{
+	"Inline math": {
+		"scope": "latex",
+		"prefix": "mk",
+		"body": "$$0$"
+	},
+	"Display Math": {
+		"scope": "latex",
+		"prefix": "md",
+		"body": ["\\[", "\t$0", "\\]"]
+	},
+	"Sum": {
+		"scope": "latex",
+		"prefix": "sum",
+		"body": "\\sum_{$1}"
+	},
+	"In": {
+		"scope": "latex",
+		"prefix": "in",
+		"body": "\\in"
+	},
+	"Line skip": {
+		"scope": "latex",
+		"prefix": "ls",
+		"body": "\\vspace{\\baselineskip}\n"
+	},
+	"enumerate": {
+		"scope": "latex",
+		"prefix": "enu",
+		"body": ["\\begin{enumerate}", "\t\\item $0", "\\end{enumerate}"],
+		"description": "Insert an enumerate environment"
+	},
+	"itemize": {
+		"scope": "latex",
+		"prefix": "item",
+		"body": ["\\begin{itemize}", "\t\\item $0", "\\end{itemize}"],
+		"description": "Insert an itemize environment"
+	},
+	"example": {
+		"scope": "latex",
+		"prefix": "ex",
+		"body": ["\\begin{example}", "\t$0", "\\end{example}"]
+	},
+	"multicols": {
+		"scope": "latex",
+		"prefix": "mc",
+		"body": ["\\begin{multicols}{$1}", "\t$0", "\\end{multicols}"]
+	},
+	"columnbreak": {
+		"scope": "latex",
+		"prefix": "cb",
+		"body": "\\columnbreak"
+	},
+	"algorithm": {
+		"scope": "latex",
+		"prefix": "algo",
+		"body": ["\\begin{algorithm}", "\\SetAlgoLined", "\\end{algorithm}"]
+	},
+	"tikzpicture": {
+		"scope": "latex",
+		"prefix": "tikz",
+		"body": ["\\begin{tikzpicture}", "\t$0", "\\end{tikzpicture}"]
+	},
+	"graph": {
+		"scope": "latex",
+		"prefix": "graph",
+		"body": ["\\begin{tikzpicture}[every node/.style={fill=white}, n/.style={circle, draw}]", "\t$0", "\\end{tikzpicture}"]
+	},
+	"node": {
+		"scope": "latex",
+		"prefix": "nodeat",
+		"body": "\\node[n] ($1) at ($2, $3) {$0};"
+	},
+	"node realtive": {
+		"scope": "latex",
+		"prefix": "noder",
+		"body": "\\node[n] ($1) [$2=of $3] {$0};"
+	},
+	"labeled edge": {
+		"scope": "latex",
+		"prefix": "ledge",
+		"body": "\\draw ($1) edge node {$0} ($2);"
+	},
+	"edge": {
+		"scope": "latex",
+		"prefix": "ed",
+		"body": "\\draw ($1) edge ($2);$0"
+	},
+	"linha em branco": {
+		"scope": "latex",
+		"prefix": "nl",
+		"body": "\\vspace{\\baselineskip}\n"
+	},
+	"codigo": {
+		"scope": "latex",
+		"prefix": "code",
+		"body": "\\begin{lstlisting}\n$0\n\\end{lstlisting}"
+	}
+}

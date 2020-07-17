@@ -1,0 +1,233 @@
+\chapter{Programação Linear - Continuação}
+
+Garante a solução ótima, mas sem garantir o tempo polinomial.
+
+\section{Programação linear}
+
+Diferente do PLI, aqui as variáveis podem ser \textbf{reais}, não necessariamente inteiras.
+
+As variáveis são sempre positivas. Se precisar de variáveis que possam ser negativas, usa-se duas variáveis na verdade, sempre em dupla ($x_i^+ - x_i^-$). A combinação das duas variáveis podem gerar os valores positivos ou negativos necessários.
+
+\subsection{Exepmlo de PL para produção}
+
+Dois tipos de produto. Cada produto do tipo 1 dá 1 de lucro, e cada produto do tipo 2 dá 2 de lucro.
+
+Maximizar: $x_1 + 2x_2$
+
+Mas existem insumos (restrições).
+
+\begin{itemize}
+    \item $x_1 \leq 7 \to \alpha$
+    \item $x_2 \leq 5 \to \beta$
+    \item $2x_1 + x_2 \leq 16 \to \gamma$
+    \item $-x_1 + x_2 \leq 3 \to \delta$
+\end{itemize}
+
+A produção também não pode ser negativa.
+
+\begin{itemize}
+    \item $x_1 \geq 0$
+    \item $x_2 \geq 0$
+\end{itemize}
+
+É possível visualizar as restições no plano.
+
+\begin{example}
+    \begin{center}
+        \def\svgwidth{.75\linewidth}
+        \import{img/}{grafico_pl.pdf_tex}
+    \end{center}
+\end{example}
+
+A função objetivo é representada por um vetor (o que importa é o comprimento, direção e sentido). Esse vetor é ortogonal a uma reta em que $x_1 + 2x_2$ é constante. Ao longo dessa  reta, o valor da função objetivo não muda.
+
+\section{Intuição geométrica do Simplex}
+
+A ideia é migrar de um vértice para um vértice vizinho do poliedro (a área dentro das restrições) sempre melhorando a função objetivo. $\to$ \textbf{Busca local}
+
+\begin{example}
+    \begin{center}
+        \def\svgwidth{.75\linewidth}
+        \import{img/}{grafico_simplex.pdf_tex}
+    \end{center}
+\end{example}
+
+Iniciando no ponto $(0, 0)$, vamos aumentando o valor de $x_1$ e, em seguida, o valor de $x_2$, já que o vetor da função objetivo indica que o valor aumenta conforme aumenta o $x_1$ e, mais ainda, o $x_2$.
+
+Depois nós voltamos, porque, apesar de diminuir o valor de $x_1$, $x_2$ contribui mais para o valor da função objetivo. E chegamos então ao máximo local. Os únicos dois vizinhos são o ponto de onde veio $(7, 2)$ e o ponto seguinte $(2, 5)$. Mas os dois têm valores piores que o ponto atual.
+
+\subsection{Convexidade}
+
+Essa estratégia funciona pois o poliedro é convexo (qualquer segmento de reta ligando dois pontos do conjunto está dentro do conjunto).
+
+Todo conjunto definido pelas restrições lineares (chamado de semi-espaço) é convexo. Porque o formato das restrições são sempre ``os pontos que estão acima (ou abaixo) desse plano''. E a intersecção de duas ou mais restrições também é convexa. Então \textbf{todo} poliedro resultante é convexo.
+
+Como o poliedro é convexo, \textbf{todo ótimo local é ótimo global}. E isso também garante que \textbf{sempre existe um ótimo em algum vértice}.
+
+\subsection{Algoritmo Simplex}
+
+Precisamos primeiramente colocar o PL na forma padrão, usando \textbf{variáveis de folga}. O método Simplex \textbf{não} trabalha com inequações, então precisa dessas variáveis de folga.
+
+Exemplo: $x_1 \leq 7 \Rightarrow x_1 + s_\alpha = 7$. Quem vai fazer o papel da desigualdade, é a variável de folga $s_\alpha$.
+
+\begin{itemize}
+    \item Função objetivo: $x_1 + 2x_2$
+    \item Restrições:
+    \begin{itemize}
+        \item $x_1 + s_\alpha = 7$
+        \item $x_2 + s_\beta = 5$
+        \item $2x_1 + x_2 + s_\gamma = 16$
+        \item $-x_1 + x_2 + s_\delta = 3$
+        \item $x_1,x_2,s_\alpha,s_\beta,s_\gamma,s_\delta\geq 0$
+    \end{itemize}
+\end{itemize}
+
+Cria uma solução básica inicial. Cada vértice corresponde a uma solução básica (só tem \textbf{uma} variável diferente de 0 para cada restrição).
+
+Enquanto houver uma variável $x_j$ fora da base (com valor 0), com coeficiente $c_j$ positivo na função objetivo, faça:
+
+\begin{itemize}
+    \item seja $i$ uma restrição com $a_{ij}$ negativo que minimiza $\frac{b_i}{-a_{ij}}$, sendo $b_i$ o lado direito dessa restrição e $a_{ij}$ o coeficiente de $x_j$ na restrição
+    \begin{itemize}
+        \item $a_{ij}$ deve ser negativo, para que $x_j$ seja positivo
+        \item $\frac{b_i}{a_{ij}}$ deve ser mínimo para que $x_j$ pare de aumentar ao chegar em uma restrição. Caso contrário, alguma variável ficará negativa.
+    \end{itemize}
+    \item Faça o pivoteamento. Insira $x_j$ na solução básica no lugar da variável $i$, faça eliminação de Gauss e atualize a função objetivo.
+\end{itemize}
+
+\begin{example}
+    Solução básica inicial:
+    \begin{itemize}
+        \item $x_1 = 0, x_2 = 0$
+        \item $s_\alpha = 7, s_\beta = 5, s_\gamma = 16, s_\delta = 3$
+    \end{itemize}
+    Escolhe uma variável não básica com coeficiente positivo na função objetivo: $x_1$.
+\end{example}
+
+Primeiro nós isolamos as variáveis de folga das restrições.
+
+\begin{example}
+    $s_\alpha = 6 - x_1$
+
+    $s_\beta = 5 - x_2$
+
+    $s_\gamma = 16 - 2x_1 - x_2$
+
+    $s_\delta = 3 + x_1 - x_2$
+\end{example}
+
+O $a_{ij}$ deve ser negativo. Se pegarmos, por exemplo, a restrição $\delta$, que tem coeficiente $+1$ para $x_1$, temos: $x_1 = -3 + s_\delta + x_2 = -3$. Isso ocorre, porque estamos ``tirando'' $s_\delta$ da solução (seu valor passa a ser 0), para que possamos colocar $x_1$ na base. Lembrando que no máximo um valor em cada restrição pode ser diferente de 0 para que nós nos matenhamos em um vértice do poliedro. Mas essa solução (com o $x_1 = -3$) não é viável, pois as variáveis não podem ter valores negativos.
+
+Outra condição necessária é que $\frac{b_i}{-a_{ij}}$ deve ser mínimo. Para as restrições com $x_1$ de coeficiente negativo ($\alpha$ e $\gamma$), temos: $\frac{7}{-(-1)} = 7 \to \alpha$ e $\frac{16}{-(-2)} = 8 \to \gamma$.
+
+Tomando a restrição $\gamma$, \textbf{errada}, pois não minimza, temos: $x_1 = \frac{16 - s_\gamma - x_2}{2} = 8$. $x_1$ não ficou com um valor inviável por ser negativa, mas passa a desrespeitar a restrição $\alpha$ ($x_1 \leq 7$). Isso porque, com a variável de folga: $s_\alpha = 7 - x_1 = 7 - 8 = -1$. A variável de folga fica com valor negativo, o que é errado, pois \textbf{nenhuma} variável pode ser negativa.
+
+Escolhendo, \textbf{de forma correta}, a restrição $\alpha$, com $\frac{7}{-(-1)} = 7$ mínimo, temos: $x_1 = 7 - s_\alpha = 7$. E devemos atualizar o valor das outras variáveis.
+
+\begin{example}
+    $s_\alpha = 0$
+
+    $s_\beta = 5 - x_2 = 5$
+    
+    $s_\gamma = 16 - 2 (7 - s_\alpha) - x_2 = 2+ s_\alpha-x_2 = 2$
+    
+    $s_\delta = 3 + 7 - s_\alpha - x_2 = 10$
+    
+    E atualizamos a função objetivo: $7 - s_\alpha + 2x_2 = 7$
+\end{example}
+
+Temos $n$ variáveis (ignorando as variáveis de folga) e $m$ restrições (ignorando as restrições de não negatividade). As variáveis de folga indicam a distância do ponto atual até a boda da restrição correspondente. No caso do exemplo, temos $n=2$ e $m=4$.
+
+O espaço em que temos é n-dimensional, ou seja, o número de dimensões é igual ao número de variáveis. Se uma solução repousa em uma intersecção de restrições, essa solução é um \underline{vértice} $\to$ É necessário que o número de restrições dentro da base seja igual ao número de variáveis para garantir que teremos um ponto. Por exemplo, a intersecção de 2 planos em um espaço tridimensional é uma reta, mas com um terceiro plano, temos um ponto de intersecção.
+
+A mudança do ponto se dá, quando deslocamos esse ponto ao longo de uma restrição que esteja \textbf{fora da base}, aquela que tem variável de folga igual a zero.
+
+\section{Algoritmo Simplex - Continuação}
+
+Paramos, na iteração anterior, no caso em que:
+
+\begin{example}
+    $x_1 = 7, x_2 = 0$
+
+    $x_1=7-s_\alpha$
+
+    $s_\beta=5-x_2$
+
+    $s_\gamma=2+2s_\alpha-x_2$
+
+    $s_\delta=10-s_\alpha-x_2$
+\end{example}
+
+Calculando $\frac{b_i}{-a_{i2}}$ para cada restrição, temos:
+
+\begin{example}
+    $\beta \to \frac{5}{-(-1)} = 5$
+
+    $\gamma\to\frac{2}{-(-1)} = 2$
+
+    $\delta\to\frac{10}{-(-1)} = 10$
+\end{example}
+
+O valor que minimiza é o da restrição $\gamma$. Dessa forma, tiramos $s_\gamma$ da base e colocamos $s_2$ na base.
+
+\begin{example}
+    Função objetivo: $7 - s_\alpha+2(2+2s_\alpha-s_\gamma) = 11 + 3s_\alpha-2s_\gamma=11$
+    
+    $x_1 = 7-s_\alpha = 7$
+
+    $s_\beta=5-(2+2s_\alpha-s_\gamma)=3-2s_\alpha+s_\gamma = 3$
+
+    $x_2 = 2+2s_\alpha-s_\gamma=2$
+
+    $s_\delta=10-s_\alpha-(2+2s_\alpha-s_\gamma)=8-3s_\alpha+s_\gamma=8$
+\end{example}
+
+Iniciando uma nova iteração. Na função objetivo ($11+3s_\alpha-2s_\gamma$), uma variável fora da base que tenha coeficiente positivo é $s_\alpha$. Vamos então colocar $s_\alpha$ na base, naquelas restrições que possuem coeficiente negativo.
+
+\begin{example}
+    $1 \to \frac{7}{-(-1)} = 7$
+
+    $\beta \to \frac{3}{-(-2)}$
+
+    $\delta \to \frac{8}{-(-3)}$
+\end{example}
+
+O que minimiza é o valor $\frac{3}{2}$, então tiramos $s_\beta$ da base e colocamos $s_\alpha$. Com isso, temos:
+
+\begin{example}
+    Função objetivo: $11+3(\frac{3}{2}+\frac{s_\gamma}{2}-\frac{s_\beta}{2})-2s_\gamma=\frac{31}{2}-\frac{1}{2}s_\gamma-\frac{3}{2}s_\beta = \frac{31}{2}$
+
+    $x_1 = 7 - (\frac{3}{2}+\frac{s_\gamma}{2}-\frac{s_\beta}{2}) = \frac{11}{2}+\frac{s_\gamma}{2}-\frac{s_\beta}{2} = \frac{11}{2}$
+
+    $s_\alpha = \frac{3}{2}+\frac{s_\gamma}{2}-\frac{s_\beta}{2} = \frac{3}{2}$
+
+    $x_2=2+2(\frac{3}{2}+\frac{s_\gamma}{2}-\frac{s_\beta}{2})-s_\gamma=2+3+s_\gamma-s_\beta-s_\gamma=5-s_\beta=5$
+
+    $s_\delta = 8-3(\frac{3}{2}+\frac{s_\gamma}{2}-\frac{s_\beta}{2})+s_\gamma=8-\frac{9}{2}-\frac{3}{2}s_\gamma+\frac{3}{2}s_\beta+s_\gamma=\frac{7}{2}-\frac{1}{2}s_\gamma+\frac{3}{2}s_\beta=\frac{7}{2}$
+\end{example}
+
+Todos os coeficientes das variáveis na função objetivo são negativos. Então estamos em um ótimo local/global. Isso se dá porque, a partir desse ponto, a direção do vetor aponta para uma região fora da área de soluções viáveis. O resultado final é, portanto:
+
+\begin{example}
+    $x_1=\frac{11}{2}, x_2=5$
+
+    $s_\alpha=\frac{3}{2}$
+
+    $s_\beta=0$
+
+    $s_\gamma=0$
+
+    $s_\delta=\frac{7}{2}$
+\end{example}
+
+\section{Observações adicionais ao Simplex}
+
+Cada variável ao modelo de PL adiciona uma dimensão ao espaço de busca, então esses modelos podem ficar bastante complexos, já que existem casos em que podemos ter milhares/milhões de variáveis (ou dimensões).
+
+Temos também que um vértice pode corresponder a mais de uma solução básica, quando mais de $n$ restrições se coincidirem naquele mesmo ponto. Nesses casos, pode-se trocar a solução básica, mas sem melhorar função objetivo. É preciso lidar com isso, às vezes trocando a base sem melhorar a função objetivo para que a restrição que melhora o resultado possa ser percorrida.
+
+Nem sempre é direto se obter uma solução viável. Mas existe uma maneira de garantir isso usando o Simplex. Adiciona-se uma variável a mais (de viabilidade) nas restrições. Cria-se uma função objetivo ``virtual'' usando apenas as variáveis de viabilidade com coeficientes negativos. Ao maximizar essa função, temos todas as variáveis de viabilidade em $0$, isso faz o algormitmo encontrar uma solução viável (mas não ótima), e usamos essa solução como inicialização do Simplex de otimização. Como as variáveis de viabilidade são 0, elas não são mais utilizadas.
+
+A implementação do Simplex é feita utilizando operações sobre matrizes (pivoteamento...) em uma matriz chamada \textit{tableau}.
+
+Esse é um algoritmo bastante clássimo, mas não é polinomial no pior caso, é exponencial, mas na prática ele tente a rodar em tempo polinomial normalmente. Algoritmos polinomiais no pior caso são: elipsoide e algoritmo dos pontos interiores.

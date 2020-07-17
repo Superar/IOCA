@@ -1,0 +1,43 @@
+\makeatletter
+\def\maketitle{%
+  \null
+  \thispagestyle{empty}%
+  \vfill
+  \begin{flushright}\leavevmode
+    \normalfont
+    {\@author\par}%
+    \hrulefill\par
+    {\huge\@title\par}%
+    \vskip 1cm
+  \end{flushright}%
+  \vfill
+  \null
+}
+
+\renewcommand{\thesection}{\@arabic\c@section}
+\makeatother
+
+\makechapterstyle{aula}{
+  \chapterstyle{default}
+  \renewcommand*{\chaptitlefont}{\normalfont\Large\scshape}
+  \renewcommand*{\chapterheadstart}{}
+  \renewcommand*{\printchaptername}{\chaptitlefont Semana}
+  \renewcommand*{\afterchapternum}{\vskip\onelineskip \hrule\vskip\onelineskip}
+  \renewcommand*{\printchapternum}{\chaptitlefont \thechapter}
+  \renewcommand{\printchaptertitle}[1]{\raggedleft\chaptitlefont ##1}
+  % \renewcommand*{\afterchaptertitle}{\vskip\onelineskip \hrule\vskip\onelineskip}
+}
+\chapterstyle{aula}
+
+\titleformat{\section}[block]
+{\filcenter\large\sffamily\bfseries}
+{Aula \thesection}
+{1em}{}
+
+\newenvironment{example}
+{
+  \begin{framed}
+    }
+    {
+  \end{framed}
+}
