@@ -1,0 +1,285 @@
+\chapter{Visão Geral de Métodos de Otimização}
+
+Visão geral de métodos mais avançados que não foram vistos durante o curso
+
+\section{Métodos exatos}
+
+\begin{itemize}
+	\item Programação dinâmica
+	\item Programação por restrições (Constraint programming) $\rightarrow$ Baseado em apresentar as restrições que a solução tem que ter. Não é necessariamente linear. Existem resolvedores para isso.
+\end{itemize}
+
+\subsection{Programação dinâmica}
+
+Resolver um problema dividindo a entrada em menores do mesmo tipo. $\rightarrow$ Divisão e conquista. Mas o que difere é que os resultados dos subproblemas são armazenados para não ter que recomputar.
+
+\begin{itemize}
+	\item O problema tem que ter uma subestrutura ótima. $\rightarrow$ A solução ótima é composta de soluções ótimas dos subproblemas
+	\item Os problemas tem que compartilhar subproblemas (para que valha a pena armazenar os resultados).
+\end{itemize}
+
+\subsubsection{Fibonacci}
+
+\begin{algorithm}
+	\SetAlgoLined
+	\SetKwFunction{FibonacciUm}{FibonacciRec}
+	\Fn{\FibonacciUm{n}}{
+		\Se{$n \leq 2$}{
+			\Retorna{1}
+		}
+		\Retorna{\FibonacciUm{n-1} $+$ \FibonacciUm{n-2}}
+	}
+\end{algorithm}
+
+O problema com esse algoritmo recursivo básico, é que muitos subproblemas são constantemente recalculados. $\rightarrow$ O método fica ineficiente
+
+Para solucionar esse problema, podemos usar a memória para armazenar os valores já calculados em uma tabela.
+
+\begin{algorithm}
+	\SetAlgoLined
+	\SetKwFunction{FibonacciDois}{FibonacciPD}
+	\Fn{\FibonacciDois{n}}{
+		Seja $F$ um vetor de tamanho $n$\;
+		$F[1] \gets F[2] \gets 1$\;
+		\Para{$i \gets 3$ até $n$}{
+			$F[i] \gets F[i-1] + F[i-2]$\;
+		}
+		\Retorna{$F[n]$}
+	}
+\end{algorithm}
+
+A tabela nesse caso é unidimensional. Mas pode ter várias outras dimensões, depende do número de índices que variam no problema. A ideia básica é, porém, preencher a tabela conforme vai resolvendo os subproblemas.
+
+\subsubsection{Problema da Mochila Binária}
+
+Seja $S* \subseteq \left\{ 1, 2, \dots, n\right\}$ uma solução ótima para $I = (\left\{ 1, 2, \dots, n\right\}, v, w, W)$. Temos duas possibilidades:
+
+\begin{itemize}
+	\item $n \notin S*$, caso em que $S*$ é solução ótima de $(\left\{ 1, 2, \dots, n-1\right\}, v, w, W) \rightarrow$ O item $n$ não está na mochila, então a solução ótima é a mesma do caso em que ele não estivesse lá para ser escolhido, mantendo o peso e os valores.
+	\item $n \in S*$, caso em que $S* \setminus \left\{ n\right\}$ é solução ótima de $(\left\{ 1, 2, \dots, n-1\right\}, v, w, W-w_n) \rightarrow$ Como $n$ está na mochila, podemos encontrar uma solução ótima com os outros itens e temos também que retirar a capacidade dele da mochila.
+\end{itemize}
+
+Sendo $V_{i, T}$ o custo de uma solução ótima que escolhe itens no subconjunto $\left\{ 1, 2, \dots, i\right\}$ para preencher uma mochila de capacitade $T$, temos:
+
+\[
+	V_{i,T} =
+	\begin{cases}
+		\max\left\{ V_{i-1, T}, V_{i-1, T-w_i} + v_i\right\} & \quad \text{se } w_i \leq T \\
+		V_{i-1, T}                                           & \quad \text{se } w_i > T
+	\end{cases}
+\]
+
+Temos que verificar se o item $i$ cabe na mochila ($w_i \leq T$). Se couber, verificamos se vale a pena colocá-lo ou não ($\max$).
+
+\begin{example}
+	$w_1 = 1, v_1 = 1$
+
+	$w_2 = 3, v_2 = 2$
+
+	$w_3 = 2, v_3 = 1$
+
+	$w_4 = 1, v_4 = 2$
+
+	$w_5 = 4, v_5 = 6$
+
+	Capacidade da mochila: $W = 4$
+
+	Caso base: a mochila não tem capacidade, não podemos considerar nenhum item. Então o valor vai ser necessariamente $0$. Também tem o caso em que não há nenhum item para ser verificado ($i = 0$), como não podemos pegar nenhum item, o valor também é $0$.
+
+	\begin{center}
+		\begin{tabular}{c|c|c|c|c|c|}
+			\cline{2-6}
+			5                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			4                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			3                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			2                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			1                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			0                                              & 0                     & 0                     & 0                     & 0                     & 0                     \\ \cline{2-6}
+			\multicolumn{1}{c}{\diagbox[dir=NE]{$i$}{$T$}} & \multicolumn{1}{c}{0} & \multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{3} & \multicolumn{1}{c}{4}
+		\end{tabular}
+	\end{center}
+
+	Começamos incrementando o $i$ e o $T$. Por exemplo, no caso em que  $i=1, T=1$, temos que o item $i$ cabe na mochila ($w_i \leq T$). Então, calculamos os valores da expressão de maximização. Preenchendo a linha toda:
+
+	\begin{center}
+		\begin{tabular}{c|c|c|c|c|c|}
+			\cline{2-6}
+			5                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			4                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			3                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			2                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			1                                              & 0                     & 1                     & 1                     & 1                     & 1                     \\ \cline{2-6}
+			0                                              & 0                     & 0                     & 0                     & 0                     & 0                     \\ \cline{2-6}
+			\multicolumn{1}{c}{\diagbox[dir=NE]{$i$}{$T$}} & \multicolumn{1}{c}{0} & \multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{3} & \multicolumn{1}{c}{4}
+		\end{tabular}
+	\end{center}
+
+	Preenchendo a linha em que consideramos o item 2, temos os casos em que ele não cabe na mochila e simplesmente pegamos os valores anteriores (abaixo, em que pegamos só o item 1).
+
+	\begin{center}
+		\begin{tabular}{c|c|c|c|c|c|}
+			\cline{2-6}
+			5                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			4                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			3                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			2                                              & 0                     & 1                     & 1                     &                       &                       \\ \cline{2-6}
+			1                                              & 0                     & 1                     & 1                     & 1                     & 1                     \\ \cline{2-6}
+			0                                              & 0                     & 0                     & 0                     & 0                     & 0                     \\ \cline{2-6}
+			\multicolumn{1}{c}{\diagbox[dir=NE]{$i$}{$T$}} & \multicolumn{1}{c}{0} & \multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{3} & \multicolumn{1}{c}{4}
+		\end{tabular}
+	\end{center}
+
+	Mas agora temos o caso em que $T=3$, ou seja, o item 2 cabe na mochila. Nesse caso, vemos se vale a pena pegá-lo ou não. O caso de não pegá-lo, temos o valor $V_{i-1, T} = 1$. O caso de pegá-lo, temos $V_{i-1,  T-w_i}+v_i = V_{1, 0} + 2 = 2$. Então vale mais a pena pegar o item 2.
+
+	Já no caso em que $T=4$, temos que $V_{i-1, T-w_i}+v_i = V_{1, 1} + 2$, ou seja, ainda há espaço livre de valor 1, em que cabe o item 1, resultando então no valor final de 3.
+
+	\begin{center}
+		\begin{tabular}{c|c|c|c|c|c|}
+			\cline{2-6}
+			5                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			4                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			3                                              & 0                     &                       &                       &                       &                       \\ \cline{2-6}
+			2                                              & 0                     & 1                     & 1                     & 2                     & 3                     \\ \cline{2-6}
+			1                                              & 0                     & 1                     & 1                     & 1                     & 1                     \\ \cline{2-6}
+			0                                              & 0                     & 0                     & 0                     & 0                     & 0                     \\ \cline{2-6}
+			\multicolumn{1}{c}{\diagbox[dir=NE]{$i$}{$T$}} & \multicolumn{1}{c}{0} & \multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{3} & \multicolumn{1}{c}{4}
+		\end{tabular}
+	\end{center}
+
+	Continuando, incluindo os outros itens:
+
+	\begin{center}
+		\begin{tabular}{c|c|c|c|c|c|}
+			\cline{2-6}
+			5                                              & 0                     & 2                     & 3                     & 3                     & 6                     \\ \cline{2-6}
+			4                                              & 0                     & 2                     & 3                     & 3                     & 4                     \\ \cline{2-6}
+			3                                              & 0                     & 1                     & 1                     & 2                     & 3                     \\ \cline{2-6}
+			2                                              & 0                     & 1                     & 1                     & 2                     & 3                     \\ \cline{2-6}
+			1                                              & 0                     & 1                     & 1                     & 1                     & 1                     \\ \cline{2-6}
+			0                                              & 0                     & 0                     & 0                     & 0                     & 0                     \\ \cline{2-6}
+			\multicolumn{1}{c}{\diagbox[dir=NE]{$i$}{$T$}} & \multicolumn{1}{c}{0} & \multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{3} & \multicolumn{1}{c}{4}
+		\end{tabular}
+	\end{center}
+\end{example}
+
+A solução final (valor final da mochila) está armazenada na última posição, em que $i=n$ e $T=W$.
+
+\begin{algorithm}
+	\SetAlgoLined
+	\SetKwFunction{MochilaPD}{MochilaPD}
+	\Fn{\MochilaPD{$n, w, v, W$}}{
+		seja $M$ uma matriz de tamanho $(n+1) \times (W+1)$\;
+		\Para{$T \gets 0$ até $W$}{
+			$M[0][T] \gets 0$\;
+		}
+		\Para{$i \gets 1$ até $n$}{
+			\Para{$T \gets 0$ até $W$}{
+				\eSe{$w_i > T$}{
+					$M[i][T] \gets M[i-1][T]$\;
+				}{
+					$M[i][T] \gets \max\left\{ m[i-1][T], M[i-1][T-w_i]+v_i\right\}$\;
+				}
+			}
+		}
+		\Retorna{M[n][W]}
+	}
+\end{algorithm}
+
+\vfill
+
+\section{Algoritmos de aproximação}
+
+Outra abordagem para lidar com problemas de otimização combinatória, são os algoritmos de aproximação. São um ``caminho do meio'' entre métodos exatos e heurísticas.
+
+Algoritmos são algoritmos que executam em tempo polinomial, sem garantir que a solução seja ótima. Mas podemos garantir que a solução está dentro de um intervalo com relação ao custo da solução ótima.
+
+Seja A um algoritmo polinomial para um problema de minimização, $A(I)$ o custo da solução de $A$ para a entrada $I$ e $\mathrm{OPT}(I)$ o custo da solução ótima.
+
+A é uma $\alpha$-aproximação se, para toda instância $I$,
+
+\[
+	A(I) \leq \alpha \cdot \mathrm{OPT}(I) \rightarrow \text{Razão de aproximação}
+\]
+
+Se o problema for de maximização, invertemos a desigualdade.
+
+\[
+	A(I) \geq \alpha\cdot \mathrm{OPT}(I)
+\]
+
+\subsection{Problema da Mochila Binária}
+
+\begin{algorithm}
+	\SetAlgoLined
+	\SetKwFunction{MochilaAprox}{MochilaAprox}
+	\Fn{\MochilaAprox{$n, w, v, W$}}{
+		Ordene e renomeie os itens para que $\frac{v_1}{w_1}\geq\frac{v_2}{w_2}\geq\dots\geq\frac{v_n}{w_n}$\;
+		\tcc{Cabe até o item $q$, mas o $q+1$ não cabe mais}
+		Seja $q$ um inteiro tal que $\sum_{i=1}^qw_i\leq W$ e $\sum_{i=1}^{q+1}w_i>W$\;
+		\Retorna{$\max\left\{ v_1 + v_2 + \dots + v_q, v_{q+1}\right\}$}
+	}
+\end{algorithm}
+
+Temos que o valor máximo entre dois valores é claramente maior que a média da soma dos valores: $\max\left\{ a, b\right\} \geq \frac{a+b}{2}$. Assim, temos:
+
+\begin{align*}
+	\text{\lstinline{MochilaAprox}}(I) &= \max\left\{ v_1 + v_2 + \dots + v_q, v_{q+1}\right\} \\
+	  & \geq \frac{1}{2}\left( v_1 + \dots + v_q + v_{q+1} \right) \\
+	  & \geq \frac{1}{2}\mathrm{OPT}_{\mathrm{frac}}(I)            \\
+	  & \geq \frac{1}{2}\mathrm{OPT}(I)
+\end{align*}
+
+Sabemos que $(v_1+\dots+v_q+v_{q+1})$ não cabe na mochila e que vai ser maior ou igual que a solução ótima da mochila fracionária, já que ordenamos os itens seguindo sua densidade e isso nos dá a solução ótima da mochila fracionária. Também sabemos que a solução ótima da mochila fracionária sempre será maior ou igual à solução da mochila inteira, pois ela vem da sua relaxação.
+
+Com isso, temos que esse algoritmo é uma $\frac{1}{2}$-aproximação.
+
+\subsection{Problema do Escalonamento}
+
+\begin{algorithm}
+	\SetAlgoLined
+	\SetKwFunction{EscalonaAprox}{EscalonaAprox}
+	\Fn{\EscalonaAprox{$n, t, m$}}{
+		\lPara{$j \gets 1$ até $m$}{$M_j \gets \emptyset$}
+		\Para{$i \gets 1$ até $n$}{
+			Seja $j$ uma máquina em que $\sum_{i' \in M_j}t_{i'}$ é mínimo\;
+			$M_j \gets M_j \bigcup \left\{ i\right\}$\;
+		}
+		\Retorna{$\max_{j=1,\dots,m}\sum_{i \in M_j}t_i$}
+	}
+\end{algorithm}
+
+O algoritmo é o mesmo algoritmo guloso usado na Semana 2. Mas ele é de aproximação também porque temos uma garantia de qualidade da solução.
+
+Seja $j$ a máquina que define o \textit{makespan} e seja $k$ a última tarefa que foi alocada a essa máquina. No momento em que a tarefa $k$ foi colocada na máquina $j$, essa máquina era a máquina menos carregada (devido ao critério guloso do algoritmo), ou seja, naquele momento $M_j$ tinha carga menor ou igual a qualquer outra máquina.
+
+Seja $l(j)=\sum_{i \in M_j}t_i$ a carga da máquina $j$. Qualquer máquina $j'$ tem carga $l(j')\geq l(j)-t_k$ (antes de colocar o item $k$, a máquina $j$ é a de menor carga). Então
+
+\[
+	(l(j)-t_k) \cdot m \leq \sum_{j'=i}^ml(j') = \sum_{i=1}^nt_i
+\]
+
+Temos que esse valor é sempre menor que o valor da carga de todas as máquinas, que no fim é apenas a carga de todas as tarefas.
+
+Dividindo por $m$:
+
+\[
+	l(j)-t_k \leq \frac{\sum_{i=1}^nt_i}{m} = \mathrm{OPT}_{\mathrm{frac}}(I) \leq \mathrm{OPT}(I)
+\]
+
+Temos que a solução ótima do escalonamento fracionário é simplesmente dividir igualmente os tempos das tarefas sobre todas as máquinas.
+
+\[
+	l(j)-t_k \leq \mathrm{OPT}(I)
+\]
+
+Assim
+
+\begin{align*}
+	\text{\lstinline{EscalonaAprox}}(I) &= l(j)\\
+	&= (l(j)-t_k)+t_k \\
+	&\leq \mathrm{OPT}(I) + t_k \\
+	&\leq \mathrm{OPT}(I) + \mathrm{OPT}(I)\\
+	&=2 \mathrm{OPT}(I)
+\end{align*}
+
+Assim, o algoritmo é uma 2-aproximação.

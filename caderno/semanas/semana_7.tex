@@ -1,0 +1,243 @@
+\chapter{Aleatoriedade}
+
+Como usar escolhas aleatórias para melhorar os algoritmos. Alguns dos métodos mais avançados (algoritmos de aproximação e meta-heurísticas) costumam usar a aleatoriedade (Ver última aula da Semana 3).
+
+Trocar decisões \textbf{arbitrárias} (\underline{determinísticas}) por escolhas \textbf{aleatórias}.
+
+\begin{itemize}
+	\item Escolha do vértice inicial
+	\item Ordem de se percorrer uma lista
+	\item Construir uma solução viável inicial
+	\item Escolher o vizinho em uma busca local
+	\item Critério de desempate
+\end{itemize}
+
+Assumindo que exista um algoritmo aleatorizado \lstinline{AlgAleat}, o algoritmo genérico (para um problema de maximização) é:
+
+\begin{algorithm}
+	\SetAlgoLined
+	\SetKwFunction{AlgAleat}{AlgAleat}
+	\SetKwFunction{MultiStart}{MultiStart}
+	\Fn{\MultiStart{$I, k$}}{
+		best\_sol $\gets -\infty$\;
+		\Para{$i \gets 1$ até $k$}{
+			curr\_sol $\gets$ \AlgAleat{$I$}\;
+			\Se{curr\_sol $>$ best\_sol}{
+				best\_sol $\gets$ curr\_sol\;
+			}
+		}
+		\Retorna{best\_sol}
+	}
+\end{algorithm}
+
+É possível também fazer um algoritmo sensível à melhoria. Por exemplo, fazer parar o algoritmo quando passar $k$ iterações \textbf{sem} melhoria ao invés de ser fixo por $k$ interações. Continua procurando enquanto melhorar.
+
+\section{Problema do Escalonamento}
+
+Usaremos o algoritmo \lstinline{EscalonaGusolo2} visto na Semana 2. No exemplo, encontramos um caso em que é melhor não ordenar as tarefas (ao ordenar o resultado é determinístico), ou seja, podemos criar um algoritmo aleatorizado que pode chegar a um caso não ordenado que me dê um melhor resultado.
+
+\begin{example}
+	$m=2$
+
+	\tikzset{tempo/.style 2 args={rectangle split, rectangle split horizontal, draw=#2, rectangle split parts=#1, fill=#2!20}}
+
+	\begin{center}
+		\begin{tikzpicture}[node distance=.25cm]
+			\node[tempo={3}{orange}] (t1) at (0, 0) {};
+			\node[tempo={2}{blue}] (t2) [right=of t1] {};
+			\node[tempo={2}{red}] (t3) [right=of t2] {};
+			\node[tempo={3}{green}] (t4) [right=of t3] {};
+			\node[tempo={2}{violet}] (t5) [right=of t4] {};
+		\end{tikzpicture}
+	\end{center}
+
+	\begin{multicols}{2}
+		Ordenando:
+
+		\begin{tikzpicture}[node distance=.25cm]
+			\node[tempo={3}{orange}] (t1) at (0, 0) {};
+			\node[tempo={3}{green}] (t2) [right=of t1] {};
+			\node[tempo={2}{blue}] (t3) [right=of t2] {};
+			\node[tempo={2}{red}] (t4) [right=of t3] {};
+			\node[tempo={2}{violet}] (t5) [right=of t4] {};
+		\end{tikzpicture}
+
+		\vspace{\baselineskip}
+
+		\begin{tabular}{l|l}
+			$M_1$ & \tikzmark{8m11} \\
+			$M_2$ & \tikzmark{8m21} \\
+		\end{tabular}
+
+		\begin{tikzpicture}[remember picture, , tempo/.append style={anchor=west, overlay}, node distance=1pt]
+			\node[tempo={3}{orange}] (t1) at (pic cs:8m11) {};
+			\node[tempo={3}{green}] (t2) at (pic cs:8m21) {};
+			\node[tempo={2}{blue}] (t3) [right=of t1] {};
+			\node[tempo={2}{red}] (t4) [right=of t2] {};
+			\node[tempo={2}{violet}] (t5) [right=of t3] {};
+		\end{tikzpicture}
+
+		\begin{center}
+			\textit{makespan} = $7$
+		\end{center}
+
+		\columnbreak
+
+		Sem ordenar:
+
+		\vspace{\baselineskip}
+		\vspace{\baselineskip}
+
+		\begin{tabular}{l|l}
+			$M_1$ & \tikzmark{8m12} \\
+			$M_2$ & \tikzmark{8m22} \\
+		\end{tabular}
+
+		\begin{tikzpicture}[remember picture, , tempo/.append style={anchor=west, overlay}, node distance=1pt]
+			\node[tempo={3}{orange}] (t1) at (pic cs:8m12) {};
+			\node[tempo={2}{blue}] (t2) at (pic cs:8m22) {};
+			\node[tempo={2}{red}] (t3) [right=of t2] {};
+			\node[tempo={3}{green}] (t4) [right=of t1] {};
+			\node[tempo={2}{violet}] (t5) [right=of t3] {};
+		\end{tikzpicture}
+
+		\begin{center}
+			\textit{makespan} = $6$
+		\end{center}
+	\end{multicols}
+\end{example}
+
+\begin{algorithm}
+	\SetAlgoLined
+	\SetKwFunction{EscalonaAleat}{EscalonaAleat}
+	\Fn{\EscalonaAleat{$n, t, m$}}{
+		\lPara{$j \gets 1$ até $m$}{$M_j \gets \emptyset$}
+		Escolha uma permutação aleatória dos itens e renomeie de acordo\;
+		\Para{$i \gets 1$ até $n$}{
+			seja $j$ uma máquina em que $\sum_{i \in M_j}t_i$ é mínimo\;
+			$M_j \gets M_j \bigcup \{i\}$\;
+		}
+		\Retorna{$\max_{j=1,\dots,m}\sum_{i\in M_j}t_i$}
+	}
+\end{algorithm}
+
+\subsection{Heurística de Busca Local}
+
+Podemos aplicar também a aleatoriedade para heurísticas de busca local. Como exemplo, temos a função \lstinline{EscalonaBuscaLocal} da Semana 3.
+
+\begin{algorithm}
+	\SetAlgoLined
+
+	\Fn{\EscalonaUm{n, t, m}}{
+		$\mathcal{M} \gets $ um escalonamento inicial\;
+		\Enqto{houver um item $i'$ na máquina mais carregada $j'$ e uma máquina $j$ tal que $l(j) + t_{i'} < l(j')$}{
+			$M_{j'} \gets M_{j'} \setminus \left\{ i'\right\}$\;
+			$M_j \gets M_j \cup \left\{ i'\right\}$\;
+		}
+		\Retorna $\max_{j=1, \dots , m}\sum_{i \in M_j}t_i$
+	}
+\end{algorithm}
+
+Podemos ter mais de uma máquina $j$ que satisfaça o critério de $l(j) + t_{i'} < l(j')$. A escolha de qual máquina vai ser efetivamente usada pode ser feita de forma gulosa (p. ex. aquela que mais diminui o \textit{makespan}). Mas podemos fazer essa escolha de forma aleatorizada também, escolhendo de forma aleatória que máquina vai receber o item $i'$.
+
+\section{Problema do Corte Máximo}
+
+Usando como base o algoritmo \lstinline{CorteMaximoGuloso} visto na Semana 2, podemos aleatorizá-lo.
+
+\begin{algorithm}
+	\SetAlgoLined
+
+	\SetKwFunction{CorteMaximoAleat}{CorteMaximoAleat}
+	\Fn{\CorteMaximoAleat{$G = (V, E)$}}{
+		$S \gets \emptyset$\;
+		$\bar{S} \gets \emptyset$\;
+		$A \gets \{s\}$ \tcc*{Vértices alcançados, existe caminho}
+		\Para{$v \in A$ com maior grau}{
+			\eSe{$|\left\{ (v, u) \in \delta(v): u \in S\right\}| \leq |\left\{ (v, u) \in \delta(v): u \in \bar{S}\right\}|$}{
+				$S \gets S \cup \{v\}$\;
+			}{
+				$\bar{S} \gets \bar{S}\cup\left\{v\right\}$
+			}
+		}
+	}
+\end{algorithm}
+
+O algoritmo usa um vértice inicial arbitrário $s$ e percorre os vértices alcançados também de maneira arbitrária (seguindo os de maior grau). Podemos escolher o vértice inicial aleatoriamente.
+
+É importante salientar que: o número de vértices é linear dado a entrada ($|V|$), então é um número não muito grande, pode valer a pena testar para todos e pegar o melhor, fazendo uma escolha determinística.
+
+Para juntar isso no algoritmo base \lstinline{MultiStart}, podemos fazer permutações aleatórias dos vértices e percorrê-las, usando o vértice atual da permutação como o inicial do algoritmo \lstinline{CorteMaximoAleat}. Dessa forma, ele vai continuar procurando em todos os vértices, mas de uma maneira aleatória e podemos colocar um critério de parada para não percorrer \textbf{todo} o conjunto de vértices quando ele for muito grande.
+
+O critério de percorrer a lista de vértices alcançados também é arbitrário (guloso). Podemos também aleatorizar esse processo.
+
+\subsection{Heurística de Busca Local}
+
+Com relação à busca local, podemos usar como base o algoritmo da Semana 3. O algoritmo \lstinline{CorteMaximoBuscaLocal} usa como base um ``corte inicial''. Esse corte inicial pode ser totalmente arbitrário, mas também pode ser construído aleatoriamente. Por exemplo, podemos sortear apenas se cada vértice está nesse corte inicial.
+
+Já no caso desse corte inicial, o número de possibilidades de escolha é muito maior ($2^{|V|-1}-1$), não sendo viável testar todas as possibilidades.
+
+\section{Embaralhamento de Knuth}
+
+Normalmente precisamos percorrer listas nos algoritmos. Uma maneira de aleatorizar é percorrer a lista permutada de maneira uniforme.
+
+Sorteamos, com probabilidade uniforme, um item do sufixo do vetor (parte do vetor não processada) e depois adicionamos o item na posição corrente.
+
+\begin{example}
+    $|1 \quad 2 \quad 3 \quad 4 \quad 5$
+
+    Escolhemos do sufixo o número 3.
+
+    $3 \quad |2 \quad 1 \quad 4 \quad 5$
+
+    Escolhemos do sufixo o número 5.
+
+    $3 \quad 5 \quad |1 \quad 4 \quad 2$
+
+    Escolhemos do sufixo o número 1.
+
+    $3 \quad 5 \quad 1 \quad |4 \quad 2$
+
+    Escolhemos do sufixo o número 2.
+
+    $3 \quad 5 \quad 1 \quad 2 \quad |4$
+
+    Permutação final: $3 \quad 5 \quad 1 \quad 2 \quad 4$
+\end{example}
+
+O algoritmo é $O(n)$. E há a garantia de que a probabilidade é uniforme para todas as permutações possíveis.
+
+\section{Problema do Caixeiro Viajante}
+
+Usamos como base o algoritmo \lstinline{TSP-Guloso4} visto na Semana 2.
+
+\begin{algorithm}
+    \SetAlgoLined
+    \Fn{\TSPquatro{$G=(V, E), \mathrm{w}$}}{
+        Seja $v$ um vértice qualquer\;
+        $C \gets (v)$\;
+        \Enqto{C não contém todos os vértices}{
+            Seja $C = (v_1, \dots , v_i)$\;
+            Escolha um vértice $x \notin C$ que \underline{minimiza} $\mathrm{w}(v_i, x)$\;
+            Insira $x$ no final de $C$\;
+        }
+        \Retorna C
+    }
+\end{algorithm}
+
+O vértice inicial $v$ pode ser escolhido aleatoriamente.
+
+Podemos também aleatorizar o critério guloso. Por exemplo, se houver empate, podemos escolher aleatoriamente qual o vértice que será incluso no caminho.
+
+Para aumentar a aleatoriedade, podemos ``relaxar'' o critério guloso para aumentar os empates que temos. Por exemplo, ao invés de pegar um vértice \underline{que minimiza} o caminho, podemos escolher os vértices \underline{próximos}.
+
+Algoritmo GRASP. Se temos $x_{\min} \notin C$ mais próximo de $v_i$ e $x_{\max} \notin C$ mais distante de $v_i$. Podemos criar um critério segundo um determinado intervalo de distância: $w(v_i, x) \leq w(v_i, x_{\min}) + \alpha \left( w(v_i, x_{\max}) - w(v_i, x_{\min}) \right)$, sendo $\alpha$ um valor entre 0 e 1 que indica a ``força'' da aleatoriedade (seleciona o quão longe estão os vértices que podemos considerar).
+
+\subsection{Heurística de Busca Local}
+
+Também podemos aleatorizar as heurísticas de busca local, por exemplo, o algoritmo \lstinline{TSP-2-OPT}.
+
+O circuito hamiltoniano inicial pode ser apenas uma permutação aleatória dos vértices (só funciona se o grafo for completo).
+
+Também podemos colocar a aleatoriedade no critério de busca, ao invés de escolher arbitrariamente uma troca que traz um ganho, pode escolher aleatoriamente qual é a troca que vai ser feita.
+
+Para fazer as permutações em um grafo não completo, podemos incluir as arestas ``que faltam'' com pesos \textbf{muito grandes}. Como o critério da busca quer encontrar trocas que diminuam o custo, ele vai acabar descartando essas arestas e ficamos com a solução do mesmo jeito. E assim, não precisamos nos preocupar em fazer um algoritmo mais complexo para gerar a permutação.

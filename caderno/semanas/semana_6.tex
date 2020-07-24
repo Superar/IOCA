@@ -89,7 +89,7 @@ Com isso, temos:
 
 \begin{multicols}{2}
 
-    \null \vfill
+    \null\vfill
     \begin{center}
         \begin{tikzpicture}[every node/.style={fill=white}, n/.style={circle, draw}]
             \node[n] (1) at (0, 0) {15,2};
@@ -104,7 +104,7 @@ Com isso, temos:
             \draw (3) edge node {$x_2\geq6$} (5);
         \end{tikzpicture}
     \end{center}
-    \vfill \null
+    \vfill\null
 
     \columnbreak
 
@@ -318,3 +318,75 @@ Em seguida, o nó com valor limitante 31 também é podado por limitante.
         \draw (2) edge node {$x_3\leq0$} (9);
     \end{tikzpicture}
 \end{example}
+
+\section{Eficiência do Branch and Bound}
+
+A eficiência depende do número de podas, que depende de:
+
+\begin{itemize}
+    \item limitante primal (melhor solução encontrada até o momento)
+    \item limitante dual (solução do PL relaxado para o nó sendo avaliado)
+\end{itemize}
+
+Então devemos encontrar \textbf{limitantes mais fortes}.
+
+\textbf{Gap}: diferença entre o limitante primal e o limitante dual ``mais frouxo'' (melhor resultado) dos nós ativos. $\rightarrow$ \lstinline{RELATIVE_MIP_GAP}
+
+\subsection{Fortalecendo limitantes primais}
+
+Pode usar heurísticas e passar essa informação para o resolvedor de PLI. $\rightarrow$ \lstinline{SetHint}
+
+Também é possível arrendondar a solução do PL para obter uma solução inteira. Tem que prestar atenção no sentido das desigualdades para saber se arredonda para cima ou para baixo. $\rightarrow$ Fazer isso abre mão de encontrar a solução ótima
+
+É comum que resolvedores tenham como setar um \textit{callback} para chamar depois de encontrar a solução da relaxação. Pode usar isso para resolver o arredondamento. $\rightarrow$ Não tem no Or-tools, mas tem no Gurobi (pago)
+
+Em geral, o valor de uma variável indica o quanto ela é ``interessante'' para a solução do problema.
+
+\subsection{Fortalecendo limitantes duais}
+
+O limitante dual é obtido da solução do PL vindo da relaxação. $\rightarrow$ Temos que melhorar a formulação do PL
+
+Devemos encontrar \textbf{novas desigualdades} que \textbf{não} eliminam nenhuma solução \textbf{inteira} válida, mas que elimine soluções fracionárias da região viável. ``Diminui a área da região viável, aproximando as desigualdades do PL aos pontos inteiros''
+
+Envoltória convexa, fecho convexo ou \textit{convex hull} $\rightarrow$ Menor conjunto convexo que possui todos os pontos de um conjunto. \textbf{Todo vértice é inteiro, desde que o conjunto só tenha pontos inteiros}.
+
+Se encontrarmos a envoltória convexa do problema e executar a relaxação nesta área, vamos sempre obter a solução ótima. $\rightarrow$ Encontrar a envoltória convexa é NP-Difícil
+
+\section{Problema do Conjunto Independente}
+
+\begin{itemize}
+    \item \textbf{Entrada:} grafo $G = (V, E)$
+    \item \textbf{Soluções viáveis:} um conjunto $S \subseteq V$ tal que toda aresta $(u, v) \in E$ tem no máximo um extremo em $S$
+    \item \textbf{Função objetivo:} tamanho de $S$
+    \item \textbf{Objetivo:} encontrar solução de valor máximo
+\end{itemize}
+
+\subsection{Formulação em PLI para o Conjunto Independente}
+
+\begin{itemize}
+    \item Variáveis: $x_u \in \{0, 1\} \quad \forall u \in V$
+    \item Função objetivo: $\max \sum_{u \in V}x_u$
+    \item Restrição: $x_u + x_v \leq 1 \quad \forall (u, v) \in E$
+\end{itemize}
+
+Na relaxação: $0 \leq x_u \leq 1$.
+
+\begin{example}
+    \begin{center}
+        \begin{tikzpicture}[every node/.style={fill=white}, n/.style={circle, draw}]
+            \node[n] (a) at (0, 0) {a};
+            \node[n] (b) [below right=of a] {b};
+            \node[n] (c) [below left=of a] {c};
+
+            \draw (a) edge (b);
+            \draw (a) edge (c);
+            \draw (c) edge (b);
+        \end{tikzpicture}
+    \end{center}
+\end{example}
+
+Se no exemplo $x_a = 0,5; x_b=0,5; x_c=0,5$. O limitante dual é $1,5$, enquanto o limitante primal é $1,0$.
+
+Sabendo que o grafo é um triângulo (as arestas vão ter que ficar sozinhas em $S$), podemos criar uma outra restrição $x_a + x_b + x_c \leq 1$. Essa restrição não elimina nenhuma solução inteira, mas melhora as soluções do PL relaxado.
+
+Isso pode servir a qualquer subgrafo completo (todos os nós conectados). $\rightarrow$ Clique

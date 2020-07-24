@@ -109,8 +109,8 @@ A ordem nos trabalhos mudou e o algoritmo não encontrou a solução ótima. A i
 
 \begin{algorithm}
     \SetAlgoLined
-    \SetKwFunction{Escalona}{EscalonaGuloso2}
-    \Fn{\Escalona{$n$, $t$, $m$}}{
+    \SetKwFunction{EscalonaDois}{EscalonaGuloso2}
+    \Fn{\EscalonaDois{$n$, $t$, $m$}}{
         \lPara{$j \gets 1$ até $m$}{ $M_j=\emptyset$}
         \underline{Ordene e renomeie os itens de modo que $t_1 \geq t_2 \geq \dots \geq t_n$}\;
         \Para{$i \gets 1$ até $n$}{
@@ -552,7 +552,7 @@ O tamanho do corte é o número de arestas que ``atravessam'' o corte.
         \Para{$v \in V$}{
             \tcc{Coloca o vértice no conjunto que tem menos vizinhos dele (aumentando o número de arestas que atravessam o corte)}
             \eSe{$|\left\{ (v, u) \in \delta(v): u \in S\right\}| \leq |\left\{ (v, u) \in \delta(v): u \in \bar{S}\right\}|$}{
-                $S \gets S \cup {v}$\;
+                $S \gets S \cup \{v\}$\;
             }{
                 $\bar{S} \gets \bar{S}\cup\left\{v\right\}$
             }
