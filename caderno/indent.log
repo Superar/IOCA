@@ -1,0 +1,36 @@
+latexindent version 3.0, a script to indent .tex files
+	latexindent lives here: /usr/local/texlive/2016/texmf-dist/scripts/latexindent/
+	Tue Jul 28 15:31:56 2020
+Processing switches
+	-c|--cruft: cruft directory
+Directory for backup files and indent.log: /home/marcio/SHARED/SHARED/Cursos/IOCA/caderno/
+YAML settings read
+	Reading defaultSettings.yaml from /usr/local/texlive/2016/texmf-dist/scripts/latexindent/defaultSettings.yaml
+	Home directory is /home/marcio (didn't find either indentconfig.yaml or .indentconfig.yaml)
+	To specify user settings you would put indentconfig.yaml here: /home/marcio/indentconfig.yaml
+	Alternatively, you can use the hidden file .indentconfig.yaml as: /home/marcio/.indentconfig.yaml
+List of items: item|myitem (see itemNames)
+looking for VERBATIM commands (see verbatimCommands)
+looking for FILE CONTENTS environments (see fileContentsEnvironments)
+	looking for filecontents:1 environments
+	looking for filecontents*:1 environments
+Phase 1: searching for objects
+	looking for ENVIRONMENTS
+	looking for IFELSEFI
+	looking for HEADINGS (chapter, section, part, etc)
+	looking for COMMANDS and key = {value}
+	looking for SPECIAL begin/end
+Objects have been found.
+Operating on: masterdocument
+Number of children:
+	149
+Phase 2: finding surrounding indentation
+Phase 3: indenting objects
+Phase 4: final indentation check
+Number of children:
+	0
+Output routine
+	Not outputting to file; see -w and -o switches for more options.
+--------------
+Please direct all communication/issues to: 
+	https://github.com/cmhughes/latexindent.pl

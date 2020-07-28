@@ -1,6 +1,6 @@
 \chapter{Aleatoriedade}
 
-Como usar escolhas aleatórias para melhorar os algoritmos. Alguns dos métodos mais avançados (algoritmos de aproximação e meta-heurísticas) costumam usar a aleatoriedade (Ver última aula da Semana 3).
+Como usar escolhas aleatórias para melhorar os algoritmos. Alguns dos métodos mais avançados (algoritmos de aproximação e meta-heurísticas) costumam usar a aleatoriedade (Ver \hyperref[sec:metaheuristicas]{última aula da Semana 3}).
 
 Trocar decisões \textbf{arbitrárias} (\underline{determinísticas}) por escolhas \textbf{aleatórias}.
 
@@ -34,7 +34,7 @@ Assumindo que exista um algoritmo aleatorizado \lstinline{AlgAleat}, o algoritmo
 
 \section{Problema do Escalonamento}
 
-Usaremos o algoritmo \lstinline{EscalonaGusolo2} visto na Semana 2. No exemplo, encontramos um caso em que é melhor não ordenar as tarefas (ao ordenar o resultado é determinístico), ou seja, podemos criar um algoritmo aleatorizado que pode chegar a um caso não ordenado que me dê um melhor resultado.
+Usaremos o algoritmo \lstinline{EscalonaGusloso2} visto na \hyperref[chp:semana2]{Semana 2}. No exemplo, encontramos um caso em que é melhor não ordenar as tarefas (ao ordenar o resultado é determinístico), ou seja, podemos criar um algoritmo aleatorizado que pode chegar a um caso não ordenado que me dê um melhor resultado.
 
 \begin{example}
 	$m=2$
@@ -123,7 +123,7 @@ Usaremos o algoritmo \lstinline{EscalonaGusolo2} visto na Semana 2. No exemplo, 
 
 \subsection{Heurística de Busca Local}
 
-Podemos aplicar também a aleatoriedade para heurísticas de busca local. Como exemplo, temos a função \lstinline{EscalonaBuscaLocal} da Semana 3.
+Podemos aplicar também a aleatoriedade para heurísticas de busca local. Como exemplo, temos a função \lstinline{EscalonaBuscaLocal} da \hyperref[chp:semana3]{Semana 3}.
 
 \begin{algorithm}
 	\SetAlgoLined
@@ -142,7 +142,7 @@ Podemos ter mais de uma máquina $j$ que satisfaça o critério de $l(j) + t_{i'
 
 \section{Problema do Corte Máximo}
 
-Usando como base o algoritmo \lstinline{CorteMaximoGuloso} visto na Semana 2, podemos aleatorizá-lo.
+Usando como base o algoritmo \lstinline{CorteMaximoGuloso} visto na \hyperref[chp:semana2]{Semana 2}, podemos aleatorizá-lo.
 
 \begin{algorithm}
 	\SetAlgoLined
@@ -172,7 +172,7 @@ O critério de percorrer a lista de vértices alcançados também é arbitrário
 
 \subsection{Heurística de Busca Local}
 
-Com relação à busca local, podemos usar como base o algoritmo da Semana 3. O algoritmo \lstinline{CorteMaximoBuscaLocal} usa como base um ``corte inicial''. Esse corte inicial pode ser totalmente arbitrário, mas também pode ser construído aleatoriamente. Por exemplo, podemos sortear apenas se cada vértice está nesse corte inicial.
+Com relação à busca local, podemos usar como base o algoritmo da \hyperref[chp:semana3]{Semana 3}. O algoritmo \lstinline{CorteMaximoBuscaLocal} usa como base um ``corte inicial''. Esse corte inicial pode ser totalmente arbitrário, mas também pode ser construído aleatoriamente. Por exemplo, podemos sortear apenas se cada vértice está nesse corte inicial.
 
 Já no caso desse corte inicial, o número de possibilidades de escolha é muito maior ($2^{|V|-1}-1$), não sendo viável testar todas as possibilidades.
 
@@ -208,7 +208,7 @@ O algoritmo é $O(n)$. E há a garantia de que a probabilidade é uniforme para 
 
 \section{Problema do Caixeiro Viajante}
 
-Usamos como base o algoritmo \lstinline{TSP-Guloso4} visto na Semana 2.
+Usamos como base o algoritmo \lstinline{TSP-Guloso4} visto na \hyperref[chp:semana2]{Semana 2}.
 
 \begin{algorithm}
     \SetAlgoLined
